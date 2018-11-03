@@ -15,12 +15,13 @@ def to_normalized_dataframe(jsonIn):
             print("Unexpected error:", sys.exc_info()[0])
             raise
     elif type(jsonIn) is list:
-        for face in jsonIn:
-            if normalized_json_dataframe:
-                normalized_json_dataframe = pd.io.json.json_normalize(jsonIn)
-            else:
-                row = pd.io.json.json_normalize(jsonIn)
-                normalized_json_dataframe = normalized_json_dataframe.append(row, ignore_index = True)
+        try:
+            for face in jsonIn:
+                if normalized_json_dataframe:
+                    normalized_json_dataframe = pd.io.json.json_normalize(jsonIn)
+                else:
+                    row = pd.io.json.json_normalize(jsonIn)
+                    normalized_json_dataframe = normalized_json_dataframe.append(row, ignore_index = True)
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
