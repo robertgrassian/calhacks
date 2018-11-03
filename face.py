@@ -6,7 +6,7 @@ class System:
     seen = []
 
     def __init__(self, sub_key):
-        self. subscription_key = sub_key
+        self.subscription_key = sub_key
         assert self.subscription_key
         self.time = datetime.datetime
 
@@ -130,7 +130,6 @@ class OUT(System):
 
 
 def test():
-
     sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
     sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
     # 2 faces of 5 different people
