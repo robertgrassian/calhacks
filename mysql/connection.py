@@ -1,5 +1,5 @@
 import MySQLdb
-
+from constants import *
 
 class MySqlConnection():
     def __init__(self):
@@ -30,7 +30,7 @@ def queryExecute(commandType, inputSql, param):
     
     print("sql(execute): " + str(con.cursor._last_executed))
 
-    if commandType == STR_SQLTYPE_SELECTL
+    if commandType == STR_SQLTYPE_SELECT:
         msg = 'result'
         for row in con.cursor:
             print(msg + "      :" + str(row))
