@@ -5,6 +5,7 @@ class MySqlConnection():
     def __init__(self):
         print("Open MySQLConnection...")
         self.connection = MySQLdb.connect(host="18.223.212.152", port=3306, user='yoneo', passwd='raptor98', db='face_base', charset='utf8')
+        print("MySQLConnection opened successfully!")
         self.cursor = self.connection.cursor(MySQLdb.cursor.DictCursor)
 
     def __del__(self):

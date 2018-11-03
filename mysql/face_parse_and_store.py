@@ -22,4 +22,3 @@ def store_to_db(dataframe, enterBool):
             pd.sql.to_sql(name='testExit', con=sqlConn.connection, if_exists='append')
         except ValueError as v:
             print("Value error, this shouldnt happen: " + v)
-
