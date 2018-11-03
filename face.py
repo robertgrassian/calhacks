@@ -10,7 +10,7 @@ class System:
         self.seen = []
         self.time = datetime.datetime
 
-    def detect(self, img, file_type='binary_data', add=True):
+    def detect(self, img, file_type='binary_data'):
         """Detects faces in img, img must be of type url or binary_data"""
         if not isinstance(img, str):
             raise Exception('Error: img_url parameter must be of type string')
@@ -32,23 +32,12 @@ class System:
             response = requests.post(face_api_url, params=params, headers=headers, json=data)
 
         faces = response.json()
-        # if add:
-        #     for face in faces:
-        #         if len(self.seen) != 0:
-        #             cur_id = face['faceId']
-        #             resp = self.recognizer(cur_id)
-        #             if resp is None:
-        #                 self.add_id(face['faceId'])
-        #                 face['time'] = self.time.today()
-        #                 continue
-        #             # if confident that face is already logged, don't re-log it
-        #             if resp['confidence'] >= System.CONFIDENCE:
-        #                 continue
-        #         self.add_id(face['faceId'])
-        #         face['time'] = self.time.today()
+        curr_time = self.time.today()
+        for face in faces:
+            face['time'] = curr_time
         return faces
 
-    def recognizer(self, cur_id, remove=False):
+    def recognizer(self, cur_id):
         """Returns json file of maxNumOdCandidatesReturned faces that match id1, each with confidence level
             Deletes id1 and matched face from self.seen"""
         if not isinstance(cur_id, str):
@@ -63,11 +52,11 @@ class System:
         }
         response = requests.post(face_api_url, json=data, headers=headers)
         recognized = response.json()
-        if remove:
-            if cur_id in self.seen:
-                self.remove_id(cur_id)
-            for face in recognized:
-                self.remove_id(face['faceId'])
+        # if remove:
+            # if cur_id in self.seen:
+            #     self.remove_id(cur_id)
+            # for face in recognized:
+            #     self.remove_id(face['faceId'])
         if len(recognized) == 0:
             return None
         return recognized[0]
@@ -89,13 +78,27 @@ class System:
                 resp = self.recognizer(cur_id)
                 if resp is None:
                     self.add_id(face['faceId'])
-                    face['time'] = self.time.today()
                     continue
                 # if confident that face is already logged, don't re-log it
                 if resp['confidence'] >= System.CONFIDENCE:
                     continue
             self.add_id(face['faceId'])
-            face['time'] = self.time.today()
+
+    def remove_faces(self, faces):
+        """Removes all matching faces from self.seen, returns list of ids that were deleted"""
+        ids = []
+        for face in faces:
+            curr_id = face['faceId']
+            recognized_face = self.recognizer(curr_id)
+            if recognized_face is None:
+                continue  # Person left who was not recorded entering...
+            recognized_id = recognized_face['faceId']
+            ids.append(recognized_id)
+            if recognized_id in self.seen:
+                self.remove_id(recognized_id)
+            if curr_id in self.seen:
+                self.remove_id(curr_id)
+        return ids
 
 
 class IN(System):
@@ -103,17 +106,31 @@ class IN(System):
         """Continuously takes in image frames and runs detection, logging them in set"""
         on = True
         while on:
-            #TODO: Get images from a webcam continuously
-            curr_image = 'orl_faces/s1/1.jpeg' #for now
+            # TODO: Get images from a webcam continuously
+            curr_image = 'orl_faces/s1/1.jpeg'  # for now
             faces = self.detect(curr_image)
             self.log_faces(faces)
-            #TODO: Send data to database
+            # TODO: Send faces to database
 
 
 class OUT(System):
     def run(self):
         """Detects faces from input, runs detection to delete id from database and log output time"""
-        pass
+        on = True
+        while on:
+            # TODO: Get images from webcam continuously
+            curr_image = 'orl_faces/s1/1.jpeg'  # for now
+            faces = self.detect(curr_image)
+            # For every face in frame, remove from list of current people
+            removed_ids = self.remove_faces(faces)
+            # Send leave time to database
+            curr_time = self.time.today()
+            output_data = []
+            for curr_id in removed_ids:
+                output_data.append({curr_id: curr_time})
+            # TODO: Send output_data to database
+
+
 
 
 def test():
@@ -125,10 +142,6 @@ def test():
     sys.log_faces(sys.detect('orl_faces/s2/1.jpeg'))
     sys.log_faces(sys.detect('orl_faces/s2/2.jpeg'))
     print(len(sys.seen))
-    # r = r[0]
-    # print(r['faceId'])
-    # t =sys.recognizer(r['faceId'])
-    # print(t)
 
 
 
