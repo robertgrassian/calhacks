@@ -1,8 +1,4 @@
 import requests
-import matplotlib.pyplot as plt
-from PIL import Image
-from matplotlib import patches
-from io import BytesIO
 
 
 class System:
@@ -31,6 +27,7 @@ class System:
         return faces
 
     def recognizer(self, id1):
+        """Returns json file of maxNumOdCandidatesReturned faces that match id1, each with confidence level"""
         if not isinstance(id1, str):
             raise Exception('Error: id parameter must be of type string')
         face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/findsimilars'
@@ -45,9 +42,16 @@ class System:
         recognized = response.json()
         return recognized
 
+    def get_ids(self):
+        return self.seen
+
+    def remove_id(self, id):
+        self.seen.remove(id)
 
 
-sys = System("553c3c0a400a4f6ea90223e6ae996ce3")
-sys.detect('https://how-old.net/Images/faces2/main007.jpg')
-sys.recognizer(sys.seen[0])
+def test():
+    sys = System("553c3c0a400a4f6ea90223e6ae996ce3")
+    sys.detect('https://how-old.net/Images/faces2/main007.jpg')
+    sys.recognizer(sys.seen[0])
 
+test()
