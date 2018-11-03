@@ -1,0 +1,7 @@
+#!/usr/bin/python3
+
+# constant
+STR_SQLTYPE_SELECT ="1"
+STR_SQLTYPE_INSERT ="2"
+STR_SQLTYPE_UPDATE ="3"
+STR_SQLTYPE_DELETE ="4"
