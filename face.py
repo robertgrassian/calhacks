@@ -26,6 +26,8 @@ class System:
         data = {'url': img_url}
         response = requests.post(face_api_url, params=params, headers=headers, json=data)
         faces = response.json()
+        for face in faces:
+            self.seen.add(face['faceId'])
         return faces
 
 
