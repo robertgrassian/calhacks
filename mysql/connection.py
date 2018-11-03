@@ -30,4 +30,17 @@ def queryExecute(commandType, inputSql, param):
     
     print("sql(execute): " + str(con.cursor._last_executed))
 
-    if commandType == STR_SQLTYPE_SELECT
+    if commandType == STR_SQLTYPE_SELECTL
+        msg = 'result'
+        for row in con.cursor:
+            print(msg + "      :" + str(row))
+            msg = '       '
+    print("______________________________")
+
+    # Commit
+    con.connection.commit()
+
+    if commandType == STR_SQLTYPE_INSERT:
+        sql = ("SELECT LAST_INSERT_ID()")
+        con.cursor.execute(sql)
+    return con.cursor
