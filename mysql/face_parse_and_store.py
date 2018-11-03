@@ -1,4 +1,4 @@
-import pandas as import pd
+import pandas as pd
 import MySQLdb
 from mysql.constants import *
 from mysql.connection import *

@@ -1,5 +1,5 @@
 import MySQLdb
-from constants import *
+from mysql.constants import *
 
 class MySqlConnection():
     def __init__(self):
