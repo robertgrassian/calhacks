@@ -12,7 +12,8 @@ class System:
         self.seen = []
 
     def detect(self, img_url):
-
+        if not isinstance(img_url, str):
+            raise Exception('Error: img_url parameter must be of type string')
         face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/detect'
 
         headers = {'Ocp-Apim-Subscription-Key': self.subscription_key}
@@ -43,9 +44,6 @@ class System:
         response = requests.post(face_api_url, json=data, headers=headers)
         recognized = response.json()
         return recognized
-
-
-
 
 
 
