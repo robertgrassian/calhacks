@@ -3,11 +3,11 @@ import datetime
 
 class System:
     CONFIDENCE = 0.5
+    seen = []
 
     def __init__(self, sub_key):
         self. subscription_key = sub_key
         assert self.subscription_key
-        self.seen = []
         self.time = datetime.datetime
 
     def detect(self, img, file_type='binary_data'):
@@ -102,25 +102,21 @@ class System:
 
 
 class IN(System):
-    def run(self):
+    def run(self, input):
         """Continuously takes in image frames and runs detection, logging them in set"""
-        on = True
-        while on:
-            # TODO: Get images from a webcam continuously
-            curr_image = 'orl_faces/s1/1.jpeg'  # for now
-            faces = self.detect(curr_image)
+        # TODO: Get images from a webcam continuously, remove input
+        for img in input:
+            faces = self.detect(img)
             self.log_faces(faces)
             # TODO: Send faces to database
 
 
 class OUT(System):
-    def run(self):
+    def run(self, input):
         """Detects faces from input, runs detection to delete id from database and log output time"""
-        on = True
-        while on:
-            # TODO: Get images from webcam continuously
-            curr_image = 'orl_faces/s1/1.jpeg'  # for now
-            faces = self.detect(curr_image)
+        # TODO: Get images from webcam continuously, remove input
+        for img in input:
+            faces = self.detect(img)
             # For every face in frame, remove from list of current people
             removed_ids = self.remove_faces(faces)
             # Send leave time to database
@@ -136,12 +132,15 @@ class OUT(System):
 def test():
 
     sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
-    sys.log_faces(sys.detect('orl_faces/s1/1.jpeg'))
-    sys.log_faces(sys.detect('orl_faces/s1/2.jpeg'))
-    sys.log_faces(sys.detect('orl_faces/s1/3.jpeg'))
-    sys.log_faces(sys.detect('orl_faces/s2/1.jpeg'))
-    sys.log_faces(sys.detect('orl_faces/s2/2.jpeg'))
-    print(len(sys.seen))
+    sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
+    # 2 faces of 5 different people
+    in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
+                'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
+    out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
+    sys.run(in_input)
+    print(len(System.seen))
+    sys2.run(out_input)
+    print(len(System.seen))
 
 
 
