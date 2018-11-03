@@ -7,8 +7,9 @@ from matplotlib import patches
 from io import BytesIO
 
 # Replace <Subscription Key> with your valid subscription key.
-subscription_key = "8153a881-a934-43f1-b85e-957b31198775"
+subscription_key = "553c3c0a400a4f6ea90223e6ae996ce3"
 assert subscription_key
+
 
 # You must use the same region in your REST call as you used to get your
 # subscription keys. For example, if you got your subscription keys from
@@ -17,7 +18,7 @@ assert subscription_key
 # Free trial subscription keys are generated in the westcentralus region.
 # If you use a free trial subscription key, you shouldn't need to change
 # this region.
-face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0'
+face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/detect'
 
 # Set image_url to the URL of an image that you want to analyze.
 image_url = 'https://how-old.net/Images/faces2/main007.jpg'
@@ -32,6 +33,7 @@ params = {
 data = {'url': image_url}
 response = requests.post(face_api_url, params=params, headers=headers, json=data)
 faces = response.json()
+
 
 # Display the original image and overlay it with the face information.
 image = Image.open(BytesIO(requests.get(image_url).content))
