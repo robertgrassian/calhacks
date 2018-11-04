@@ -8,7 +8,9 @@ import os
 class System:
     CONFIDENCE = 0.5
     seen = []
-
+    curr_data = {}
+    all_data = {}
+    left_data = {}
     def __init__(self, sub_key):
         self.subscription_key = sub_key
         assert self.subscription_key
@@ -39,6 +41,10 @@ class System:
         curr_time = self.time.today()
         for face in faces:
             face['time'] = curr_time
+            if 'mask' in face['faceAttributes']['accessories']:
+                face['faceAttributes']['accessories'] = True
+            else:
+                face['faceAttributes']['accessories'] = False
         return faces
 
     def recognizer(self, cur_id):
@@ -76,31 +82,40 @@ class System:
     def log_faces(self, faces):
         """Adds faces to self.seen if they are new"""
         for face in faces:
+            cur_id = face['faceId']
             if len(self.seen) != 0:
-                cur_id = face['faceId']
                 resp = self.recognizer(cur_id)
                 if resp is None:
-                    self.add_id(face['faceId'])
+                    self.add_id(cur_id)
+                    System.curr_data[cur_id] = face
+                    System.all_data[cur_id] = face
                     continue
                 # if confident that face is already logged, don't re-log it
                 if resp['confidence'] >= System.CONFIDENCE:
                     continue
-            self.add_id(face['faceId'])
+            self.add_id(cur_id)
+            System.curr_data[cur_id] = face
+            System.all_data[cur_id] = face
 
     def remove_faces(self, faces):
         """Removes all matching faces from self.seen, returns list of ids that were deleted"""
-        ids = []
+        ids = []  # Consists of sublists [old_id, recognized_id]
         for face in faces:
             curr_id = face['faceId']
             recognized_face = self.recognizer(curr_id)
             if recognized_face is None:
                 continue  # Person left who was not recorded entering...
+            # If not confident that person is a match, don't remove
+            if recognized_face['confidence'] < System.CONFIDENCE:
+                continue
             recognized_id = recognized_face['faceId']
-            ids.append(recognized_id)
+            ids.append([curr_id, recognized_id])
             if recognized_id in self.seen:
                 self.remove_id(recognized_id)
+                del System.curr_data[recognized_id]
             if curr_id in self.seen:
                 self.remove_id(curr_id)
+                del System.curr_data[curr_id]
         return ids
 
 
@@ -143,14 +158,22 @@ class OUT(System):
             ret, frame = cap.read()
             cv2.imwrite('photo.jpg', frame)
             faces = self.detect('photo.jpg')
+
             os.remove('photo.jpg')
             # For every face in frame, remove from list of current people
             removed_ids = self.remove_faces(faces)
-            # Send leave time to database
-            curr_time = self.time.today()
-            output_data = []
-            for curr_id in removed_ids:
-                output_data.append({curr_id: curr_time})
+            for old_id, matched_id in removed_ids:
+                for face in faces:
+                    if face['faceId'] == old_id:
+                        System.left_data[matched_id] = face
+                        System.left_data[matched_id]['faceId'] = matched_id
+
+
+
+            # curr_time = self.time.today()
+            # output_data = []
+            # for curr_id in removed_ids:
+            #     output_data.append({curr_id: curr_time, })
             # TODO: Send output_data to database
 
         cap.release()
@@ -163,6 +186,7 @@ def run_system(subscription_key):
     for _ in range(1):
         in_system.run(3)
         out_system.run(3)
+        # Call graph func
 
 
 def test():
