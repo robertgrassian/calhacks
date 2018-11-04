@@ -132,7 +132,6 @@ class OUT(System):
 
 def test():
 
-    f = FrameGrabber()
     sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
     sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
     # 2 faces of 5 different people
