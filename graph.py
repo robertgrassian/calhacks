@@ -64,3 +64,40 @@ def graph3(total, left):
     timeInClub = [(faceLeft["time"] - total[faceLeft['faceId']]['time']).seconds // 60 for faceLeft in left.values()]
     return go.Histogram(x=timeInClub)
 
+def pyramidGraph(total):
+    menAge = []
+    womenAge = []
+    max = 0
+    for j in total.values():
+        if j['faceAttributes']['gender'] == 'male':
+            menAge.append(j['faceAttributes']['age'])
+        else:
+            womenAge.append(j['faceAttributes']['age'])
+            
+    women_bins = np.array([-600, -623, -653, -650, -670, -578, -541, -411, -322, -230])
+    men_bins = np.array([600, 623, 653, 650, 670, 578, 541, 360, 312, 170])
+    layout = go.Layout(yaxis=go.layout.YAxis(title='Age'),
+                       xaxis=go.layout.XAxis(
+                           range=[-1200, 1200],
+                           tickvals=[-1000, -700, -300, 0, 300, 700, 1000],
+                           ticktext=[1000, 700, 300, 0, 300, 700, 1000],
+                           title='Number'),
+                       barmode='overlay',
+                       bargap=0.1)
+
+    data = [go.Bar(y=total,
+                   x=men_bins,
+                   orientation='h',
+                   name='Men',
+                   hoverinfo='x',
+                   marker=dict(color='powderblue')
+                   ),
+            go.Bar(y=total,
+                   x=women_bins,
+                   orientation='h',
+                   name='Women',
+                   text=-1 * women_bins.astype('int'),
+                   hoverinfo='text',
+                   marker=dict(color='seagreen')
+                   )]
+
