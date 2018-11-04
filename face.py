@@ -124,17 +124,14 @@ class System:
 
 
 class IN(System):
-    def run(self, duration):  # TODO: Get rid of start_time if not using pseudosystem
+    def run(self):  # TODO: Get rid of start_time if not using pseudosystem
         """Continuously takes in image frames and runs detection, logging them in set"""
         # for img in test_input:
         print("starting in")
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
-            raise Exception("Error: Video Camera not found")
-        start_time = time.process_time()
+            raise Exception("Error: IN video Camera not found")
         while True:
-            if time.process_time() - start_time >= duration:
-                break
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             ret, frame = cap.read()
@@ -142,21 +139,20 @@ class IN(System):
             faces = self.detect('photo1.jpg')
             os.remove('photo1.jpg')
             self.log_faces(faces)
-            print(faces)
+            print("Faces currently inside ", self.seen)
             # TODO: Send faces to database
         cap.release()
 
 
 class OUT(System):
-    def run(self, duration):  # TODO: Get ride of start_time if not using pseudosystem
+    def run(self):  # TODO: Get ride of start_time if not using pseudosystem
         """Detects faces from input, runs detection to delete id from database and log output time"""
         # for img in test_input:
         print("starting out")
         cap = cv2.VideoCapture(1)
-        start_time = time.process_time()
+        if not cap.isOpened():
+            raise Exception("Error: OUT video camera not found")
         while True:
-            if time.process_time() - start_time >= duration:
-                break
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             ret, frame = cap.read()
@@ -172,8 +168,9 @@ class OUT(System):
                         System.left_data[matched_id] = face
                         System.left_data[matched_id]['faceId'] = matched_id
 
+            print("Faces left", System.left_data)
 
-            print(faces)
+
             # curr_time = self.time.today()
             # output_data = []
             # for curr_id in removed_ids:
@@ -187,14 +184,12 @@ def run_system(subscription_key):
     """Runs Pseudosystem that imitates 2 webcams, switches between the 2 systems every 10 seconds"""
     in_system = IN(subscription_key)
     out_system = OUT(subscription_key)
-    for _ in range(1):
-        t1 = threading.Thread(name='in', target=in_system.run, args=[3])
-        t2 = threading.Thread(name='out', target=out_system.run, args=[3])
-        t1.start()
-        t2.start()
-        # in_system.run(3)
-        # out_system.run(3)
-        # Call graph func
+
+    t1 = threading.Thread(name='in', target=in_system.run)
+    t2 = threading.Thread(name='out', target=out_system.run)
+    t1.start()
+    t2.start()
+    # Call graph func
 
 
 def test():
