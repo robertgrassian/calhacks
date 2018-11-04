@@ -3,13 +3,15 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 
-def graph_all(dataframe):
+def graph_all(inFrame, outFrame):
     plt.ion()
     fig = plt.figure(1)
     plt.subplot(221)
-    create_age_hist(dataframe)
+    create_age_hist(inFrame)
     plt.subplot(222)
-    create_gender_bar(dataframe)
+    create_gender_bar(inFrame)
+    plt.subplot(223)
+    out_graph_test(outFrame)
     plt.pause(1)
     plt.clf()
 
@@ -36,3 +38,9 @@ def create_gender_bar(dataframe):
     g = sns.barplot(data=gender_info, x='faceAttributes.gender', y='faceId', hue='faceAttributes.gender', palette=['r','b'])
     plt.xlabel('Number of Men vs Women')
     plt.show()
+
+def out_graph_test(dataframe):
+    out = dataframe['faceAttributes.age']
+
+    plt.bar(out)
+

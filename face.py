@@ -130,6 +130,13 @@ class System:
             stamped_face = face
             
             if recognized_id in self.seen:
+                stamped_face['enter_time'] = System.curr_df[System.curr_df['faceId'] == recognized_id]['time'][0]
+                normed_stamp = to_normalized_dataframe(stamped_face)
+                if System.left_df is not None:
+                    System.left_df = df_append(System.left_df, normed_stamp)
+                else:
+                    System.left_df = normed_stamp
+                System.curr_df = System.curr_df[System.curr_df['faceId'] != recognized_id]
                 self.remove_id(recognized_id)
                 del System.curr_data[recognized_id]
             if curr_id in self.seen:
@@ -157,9 +164,9 @@ class IN(System):
             faces = self.detect('photo1.jpg')
             os.remove('photo1.jpg')
             self.log_faces(faces)
-            if not System.curr_df is None:
-                print("Faces currently inside ", self.seen)
-                graph_all(System.curr_df)
+            # if not System.curr_df is None:
+            #     print("Faces currently inside ", self.seen)
+            #     graph_all(System.curr_df)
             # TODO: Send faces to database
         cap.release()
 
@@ -187,7 +194,11 @@ class OUT(System):
                     if face['faceId'] == old_id:
                         System.left_data[matched_id] = face
                         System.left_data[matched_id]['faceId'] = matched_id
-
+            print("LEFT DF")
+            print(System.left_df)
+            if System.left_df is not None:
+                print("Faces currently inside ", self.seen)
+                graph_all(System.curr_df, System.left_df)
             print("Faces left", System.left_data)
 
 
