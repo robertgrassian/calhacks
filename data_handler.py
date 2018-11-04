@@ -12,6 +12,6 @@ def data_in(jsonIn):
     store_to_db(new_df, True)
 
     # Creates df based off of current SQL table TODO: Make sure table name is current
-    current_data = read_sql_table("enterTable")
+    current_data = read_sql_table("testEnter").drop(['index'], axis=1)
     print(current_data)
     return current_data

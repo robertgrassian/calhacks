@@ -32,5 +32,5 @@ testJson = testJson = {
       },
       "time":"2018"
    }
-data_in(testJson)
+curr_data = data_in(testJson)
 print("All tests work")
