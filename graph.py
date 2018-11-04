@@ -10,11 +10,18 @@ import json
 plotly.tools.set_credentials_file(username='trevorwise16', api_key='EhhKIRbvdFkt3pfcIBP4')
 
 def graph(arrived, left, total):
-    age = [json.load(j)['faceAttributes']['age'] for j in arrived.values]
-    fig = tools.make_subplots(rows=2, cols=2)
+    print("arrived")
+    print(arrived)
+    print("left")
+    print(left)
+    print("total")
+    print(total)
 
+    age = [j['faceAttributes']['age'] for j in total.values()]
+    fig = tools.make_subplots(rows=1, cols=2)
+    print(age)
     #age histogram
-    g1 = go.Histogram(age)
+    g1 = go.Histogram(x=age)
 
 
     labels = ['Male', 'Female']
@@ -22,7 +29,8 @@ def graph(arrived, left, total):
 
     men = 0
     women = 0
-    for face in arrived.values():
+    #TODO: MAybe change just to people in the room
+    for face in total.values():
         if face['faceAttributes']['gender'] == 'male':
             men += 1
         else:
@@ -32,19 +40,23 @@ def graph(arrived, left, total):
                    hoverinfo='label+percent', textinfo='value',
                    textfont=dict(size=20),
                    marker=dict(colors=colors,
-                   line=dict(color='#000000', width=2)))
+                   line=dict(color='#000000', width=2)),
+                domain={'x': [0.0, 0.5], 'y': [0.0, 0.5]})
 
-    timeInClub = [faceLeft["time"] - total[faceLeft['faceId']]['time'] for faceLeft in left.values()]
+    timeInClub = [(faceLeft["time"] - total[faceLeft['faceId']]['time']).seconds // 60 for faceLeft in left.values()]
 
 
-    g3 = go.Histogram(timeInClub)
+    g3 = go.Histogram(x=timeInClub)
 
     fig.append_trace(g1, 1, 1)
-    fig.append_trace(g2, 1, 2)
-    fig.append_trace(g3, 2, 1)
+    # fig.append_trace(g2, 1, 2)
+    fig.append_trace(g3, 1, 2)
 
     py.plot(fig, filename='basic-line', auto_open=True)
-
+    fig.append_trace(g1, 1, 1)
+    #fig.append_trace(g2, 1, 2)
+    py.plot(fig, filename="basic-line", auto_open=True)
+    plt.show()
 
 '''  
     sentimentDifference = []
