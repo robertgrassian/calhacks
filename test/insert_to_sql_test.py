@@ -30,13 +30,7 @@ testJson = {
    
          ]
       },
-      "time":datetime.datetime(2018,
-      11,
-      3,
-      13,
-      30,
-      41,
-      948760   )
+      "time":"2018"
    }
 print("test Json initialized")
 # Parse JSON file to pandas dataframe
