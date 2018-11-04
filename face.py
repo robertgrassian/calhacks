@@ -3,6 +3,7 @@ import datetime
 import time
 import cv2
 import os
+import graph
 
 
 class System:
@@ -187,6 +188,7 @@ def run_system(subscription_key):
         in_system.run(3)
         out_system.run(3)
         # Call graph func
+        graph.graph(in_system.curr_data,in_system.left_data,in_system.all_data)
 
 
 def test():
