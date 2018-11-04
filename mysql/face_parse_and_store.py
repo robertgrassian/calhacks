@@ -14,7 +14,7 @@ def store_to_db(dataframe, enterBool):
 
     if (enterBool):
         try:
-            dataframe.to_sql(name='testEnter', con=engine, if_exists='replace')
+            dataframe.to_sql(name='testEnter', con=engine, if_exists='append')
         except ValueError as v:
             print("Value error, this shouldnt happen: " + v)
     else:
