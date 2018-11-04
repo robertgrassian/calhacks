@@ -185,17 +185,13 @@ def run_system(subscription_key):
     """Runs Pseudosystem that imitates 2 webcams, switches between the 2 systems every 10 seconds"""
     in_system = IN(subscription_key)
     out_system = OUT(subscription_key)
-    for _ in range(1):
-        in_system.run(3)
-        out_system.run(3)
-        # Call graph func
-        graph.graph(in_system.curr_data,in_system.left_data,in_system.all_data)
 
     t1 = threading.Thread(name='in', target=in_system.run)
     t2 = threading.Thread(name='out', target=out_system.run)
     t1.start()
     t2.start()
     # Call graph func
+    graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
 
 
 
