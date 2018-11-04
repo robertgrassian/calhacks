@@ -33,14 +33,10 @@ testJson = {
       },
       "time":"2018"
    }
-# testJson = {
-#     'firstname' : 'Yoneo',
-#     'lastname' : 'Arai',
-#     'age' : 20
-# }
 print("test Json initialized")
 # Parse JSON file to pandas dataframe
 df = to_normalized_dataframe(testJson)
+print(df)
 print("Test dataframe created")
 # Append testJson to MySQL database
 store_to_db(df, True)
