@@ -38,7 +38,7 @@ def df_append(dataframe, face_frame):
     if dataframe is None:
         return face_frame
     else:
-        if not id_in_df(dataframe, face_frame['faceId']):
+        if not id_in_df(dataframe, face_frame['faceId'][0]):
             dataframe = dataframe.append(face_frame, ignore_index=True)
     return dataframe
 

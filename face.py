@@ -19,7 +19,7 @@ class System:
     all_data = {}
     left_data = {}
     curr_df = None
-
+    left_df = None
     def __init__(self, sub_key):
         self.subscription_key = sub_key
         assert self.subscription_key
@@ -127,6 +127,8 @@ class System:
                 continue
             recognized_id = recognized_face['faceId']
             ids.append([curr_id, recognized_id])
+            stamped_face = face
+            
             if recognized_id in self.seen:
                 self.remove_id(recognized_id)
                 del System.curr_data[recognized_id]
@@ -156,11 +158,8 @@ class IN(System):
             os.remove('photo1.jpg')
             self.log_faces(faces)
             if not System.curr_df is None:
-                print(System.curr_df['faceId'])
                 print("Faces currently inside ", self.seen)
-                create_age_hist(System.curr_df)
-                print("Hist")
-                create_gender_bar(System.curr_df)
+                graph_all(System.curr_df)
             # TODO: Send faces to database
         cap.release()
 
