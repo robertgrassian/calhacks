@@ -10,6 +10,7 @@ def ssh_read_in_db():
     ) as server:
         conn = create_engine("mysql+mysqldb://server:calhacks@127.0.0.1:3306/face_base")
     df = pd.read_sql_table(table_name='testEnter', con=conn)
+
     print(df)
 
 # def ssh_write_to_db():

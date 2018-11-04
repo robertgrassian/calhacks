@@ -8,6 +8,9 @@ import threading
 import json
 import time
 import keyboard
+from parsing.face_json_parse import *
+import pandas as pd
+from matGraph import *
 
 class System:
     CONFIDENCE = 0.5
@@ -15,6 +18,8 @@ class System:
     curr_data = {}
     all_data = {}
     left_data = {}
+    curr_df = None
+    left_df = None
     def __init__(self, sub_key):
         self.subscription_key = sub_key
         assert self.subscription_key
@@ -89,17 +94,23 @@ class System:
         """Adds faces to self.seen if they are new"""
         for face in faces:
             cur_id = face['faceId']
+            face_df = to_normalized_dataframe(face)
             if len(self.seen) != 0:
                 resp = self.recognizer(cur_id)
                 if resp is None:
                     self.add_id(cur_id)
                     System.curr_data[cur_id] = face
                     System.all_data[cur_id] = face
+                    System.curr_df = df_append(System.curr_df, face_df)
                     continue
                 # if confident that face is already logged, don't re-log it
                 if resp['confidence'] >= System.CONFIDENCE:
                     continue
             self.add_id(cur_id)
+            if System.curr_df is None:
+                System.curr_df = face_df
+            else:
+                System.curr_df = df_append(System.curr_df, face_df)
             System.curr_data[cur_id] = face
             System.all_data[cur_id] = face
 
@@ -116,7 +127,16 @@ class System:
                 continue
             recognized_id = recognized_face['faceId']
             ids.append([curr_id, recognized_id])
+            stamped_face = face
+            
             if recognized_id in self.seen:
+                stamped_face['enter_time'] = System.curr_df[System.curr_df['faceId'] == recognized_id]['time'][0]
+                normed_stamp = to_normalized_dataframe(stamped_face)
+                if System.left_df is not None:
+                    System.left_df = df_append(System.left_df, normed_stamp)
+                else:
+                    System.left_df = normed_stamp
+                System.curr_df = System.curr_df[System.curr_df['faceId'] != recognized_id]
                 self.remove_id(recognized_id)
                 del System.curr_data[recognized_id]
             if curr_id in self.seen:
@@ -144,7 +164,9 @@ class IN(System):
             faces = self.detect('photo1.jpg')
             os.remove('photo1.jpg')
             self.log_faces(faces)
-            print("Faces currently inside ", self.seen)
+            # if not System.curr_df is None:
+            #     print("Faces currently inside ", self.seen)
+            #     graph_all(System.curr_df)
             # TODO: Send faces to database
         cap.release()
 
@@ -172,7 +194,11 @@ class OUT(System):
                     if face['faceId'] == old_id:
                         System.left_data[matched_id] = face
                         System.left_data[matched_id]['faceId'] = matched_id
-
+            print("LEFT DF")
+            print(System.left_df)
+            if System.left_df is not None:
+                print("Faces currently inside ", self.seen)
+                graph_all(System.curr_df, System.left_df)
             print("Faces left", System.left_data)
 
 
@@ -195,8 +221,12 @@ def run_system(subscription_key):
     t1.start()
     t2.start()
     # Call graph func
+    x = 0
     while True:
+        x += 1
         status = input()
+        if x == 1000:
+            graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
         if status == 'graph':
             graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
 

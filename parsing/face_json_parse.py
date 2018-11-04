@@ -17,7 +17,7 @@ def to_normalized_dataframe(jsonIn):
     elif type(jsonIn) is list:
         try:
             for face in jsonIn:
-                if normalized_json_dataframe:
+                if normalized_json_dataframe is None:
                     normalized_json_dataframe = pd.io.json.json_normalize(jsonIn)
                 else:
                     row = pd.io.json.json_normalize(jsonIn)
@@ -27,3 +27,19 @@ def to_normalized_dataframe(jsonIn):
             raise
 
     return normalized_json_dataframe
+
+def id_in_df(dataframe, id):
+    ids = dataframe['faceId'].unique()
+    if id in ids:
+        return True
+    return False
+
+def df_append(dataframe, face_frame):
+    if dataframe is None:
+        return face_frame
+    else:
+        if not id_in_df(dataframe, face_frame['faceId'][0]):
+            dataframe = dataframe.append(face_frame, ignore_index=True)
+    return dataframe
+
+
