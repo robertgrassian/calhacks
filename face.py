@@ -3,6 +3,8 @@ import datetime
 import time
 import cv2
 import os
+import graph
+import threading
 
 
 class System:
@@ -123,43 +125,42 @@ class System:
 
 
 class IN(System):
-    def run(self, duration):  # TODO: Get rid of start_time if not using pseudosystem
+    def run(self):  # TODO: Get rid of start_time if not using pseudosystem
         """Continuously takes in image frames and runs detection, logging them in set"""
         # for img in test_input:
+        print("starting in")
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
-            raise Exception("Error: Video Camera not found")
-        start_time = time.process_time()
+            raise Exception("Error: IN video Camera not found")
         while True:
-            if time.process_time() - start_time >= duration:
-                break
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             ret, frame = cap.read()
-            cv2.imwrite('photo.jpg', frame)
-            faces = self.detect('photo.jpg')
-            os.remove('photo.jpg')
+            cv2.imwrite('photo1.jpg', frame)
+            faces = self.detect('photo1.jpg')
+            os.remove('photo1.jpg')
             self.log_faces(faces)
+            print("Faces currently inside ", self.seen)
             # TODO: Send faces to database
         cap.release()
 
 
 class OUT(System):
-    def run(self, duration):  # TODO: Get ride of start_time if not using pseudosystem
+    def run(self):  # TODO: Get ride of start_time if not using pseudosystem
         """Detects faces from input, runs detection to delete id from database and log output time"""
         # for img in test_input:
-        cap = cv2.VideoCapture(0)
-        start_time = time.process_time()
+        print("starting out")
+        cap = cv2.VideoCapture(1)
+        if not cap.isOpened():
+            raise Exception("Error: OUT video camera not found")
         while True:
-            if time.process_time() - start_time >= duration:
-                break
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             ret, frame = cap.read()
-            cv2.imwrite('photo.jpg', frame)
-            faces = self.detect('photo.jpg')
+            cv2.imwrite('photo2.jpg', frame)
+            faces = self.detect('photo2.jpg')
 
-            os.remove('photo.jpg')
+            os.remove('photo2.jpg')
             # For every face in frame, remove from list of current people
             removed_ids = self.remove_faces(faces)
             for old_id, matched_id in removed_ids:
@@ -168,6 +169,7 @@ class OUT(System):
                         System.left_data[matched_id] = face
                         System.left_data[matched_id]['faceId'] = matched_id
 
+            print("Faces left", System.left_data)
 
 
             # curr_time = self.time.today()
@@ -183,10 +185,14 @@ def run_system(subscription_key):
     """Runs Pseudosystem that imitates 2 webcams, switches between the 2 systems every 10 seconds"""
     in_system = IN(subscription_key)
     out_system = OUT(subscription_key)
-    for _ in range(1):
-        in_system.run(3)
-        out_system.run(3)
-        # Call graph func
+
+    t1 = threading.Thread(name='in', target=in_system.run)
+    t2 = threading.Thread(name='out', target=out_system.run)
+    t1.start()
+    t2.start()
+    # Call graph func
+    graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
+
 
 
 def test():
