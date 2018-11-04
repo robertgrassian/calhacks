@@ -61,9 +61,7 @@ class System:
         if len(recognized) == 0:
             return None
         if not isinstance(recognized, list):
-            print("hmmmmmmm")
-            print(recognized)
-            return recognized
+            raise Exception("Probably Error with the recognizer")
         return recognized[0]
 
     def get_ids(self):
@@ -97,8 +95,6 @@ class System:
             recognized_face = self.recognizer(curr_id)
             if recognized_face is None:
                 continue  # Person left who was not recorded entering...
-            print("deleting...")
-            print(recognized_face)
             recognized_id = recognized_face['faceId']
             ids.append(recognized_id)
             if recognized_id in self.seen:
@@ -165,8 +161,8 @@ def run_system(subscription_key):
     in_system = IN(subscription_key)
     out_system = OUT(subscription_key)
     for _ in range(1):
-        in_system.run(5)
-        out_system.run(5)
+        in_system.run(3)
+        out_system.run(3)
 
 
 def test():
