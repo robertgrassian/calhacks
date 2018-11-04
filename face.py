@@ -1,5 +1,6 @@
 import requests
 import datetime
+import cv2
 
 
 class System:
@@ -14,7 +15,7 @@ class System:
     def detect(self, img, file_type='binary_data'):
         """Detects faces in img, img must be of type url or binary_data"""
         if not isinstance(img, str):
-            raise Exception('Error: img_url parameter must be of type string')
+            raise Exception('Error: img parameter must be of type string')
 
         face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/detect'
         params = {
@@ -101,6 +102,21 @@ class System:
                 self.remove_id(curr_id)
         return ids
 
+    def webcam_capture(self):
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            raise Exception("Error: Video Camera Not Found")
+        # while True:
+        ret, frame = cap.read()
+        cv2.imwrite('photo.jpg', frame)
+        # self.detect(str(frame))
+        # cv2.imshow('frame', frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     return
+        # cap.release()
+        # cv2.destroyAllWindows()
+
+
 
 class IN(System):
     def run(self, input):
@@ -133,15 +149,16 @@ class OUT(System):
 def test():
 
     sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
-    sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
-    # 2 faces of 5 different people
-    in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
-                'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
-    out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
-    sys.run(in_input)
-    print(len(System.seen))
-    sys2.run(out_input)
-    print(len(System.seen))
+    sys.webcam_capture()
+    # sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
+    # # 2 faces of 5 different people
+    # in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
+    #             'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
+    # out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
+    # sys.run(in_input)
+    # print(len(System.seen))
+    # sys2.run(out_input)
+    # print(len(System.seen))
 
 
 
