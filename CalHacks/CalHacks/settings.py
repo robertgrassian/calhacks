@@ -25,12 +25,13 @@ SECRET_KEY = '50_i2hg)e4#x8guzs9ey84m64oqb1s*i7%g+8qk0)^i_6l-7=8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['bd74d92f.ngrok.io']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'faceStream.apps.FacestreamConfig',
     'django.contrib.admin',
     'django.contrib.auth',

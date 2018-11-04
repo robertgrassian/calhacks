@@ -1,5 +1,8 @@
 import requests
 import datetime
+import time
+import cv2
+import os
 
 
 class System:
@@ -14,7 +17,7 @@ class System:
     def detect(self, img, file_type='binary_data'):
         """Detects faces in img, img must be of type url or binary_data"""
         if not isinstance(img, str):
-            raise Exception('Error: img_url parameter must be of type string')
+            raise Exception('Error: img parameter must be of type string')
 
         face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/detect'
         params = {
@@ -43,6 +46,8 @@ class System:
             Deletes id1 and matched face from self.seen"""
         if not isinstance(cur_id, str):
             raise Exception('Error: id parameter must be of type string')
+        if len(self.seen) == 0:
+            return None
         face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/findsimilars'
         headers = {'Ocp-Apim-Subscription-Key': self.subscription_key}
         data = {
@@ -53,13 +58,10 @@ class System:
         }
         response = requests.post(face_api_url, json=data, headers=headers)
         recognized = response.json()
-        # if remove:
-            # if cur_id in self.seen:
-            #     self.remove_id(cur_id)
-            # for face in recognized:
-            #     self.remove_id(face['faceId'])
         if len(recognized) == 0:
             return None
+        if not isinstance(recognized, list):
+            raise Exception("Probably Error with the recognizer")
         return recognized[0]
 
     def get_ids(self):
@@ -102,22 +104,46 @@ class System:
         return ids
 
 
+
+
+
 class IN(System):
-    def run(self, input):
+    def run(self, duration):  # TODO: Get rid of start_time if not using pseudosystem
         """Continuously takes in image frames and runs detection, logging them in set"""
-        # TODO: Get images from a webcam continuously, remove input
-        for img in input:
-            faces = self.detect(img)
+        # for img in test_input:
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            raise Exception("Error: Video Camera not found")
+        start_time = time.process_time()
+        while True:
+            if time.process_time() - start_time >= duration:
+                break
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            ret, frame = cap.read()
+            cv2.imwrite('photo.jpg', frame)
+            faces = self.detect('photo.jpg')
+            os.remove('photo.jpg')
             self.log_faces(faces)
             # TODO: Send faces to database
+        cap.release()
 
 
 class OUT(System):
-    def run(self, input):
+    def run(self, duration):  # TODO: Get ride of start_time if not using pseudosystem
         """Detects faces from input, runs detection to delete id from database and log output time"""
-        # TODO: Get images from webcam continuously, remove input
-        for img in input:
-            faces = self.detect(img)
+        # for img in test_input:
+        cap = cv2.VideoCapture(0)
+        start_time = time.process_time()
+        while True:
+            if time.process_time() - start_time >= duration:
+                break
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            ret, frame = cap.read()
+            cv2.imwrite('photo.jpg', frame)
+            faces = self.detect('photo.jpg')
+            os.remove('photo.jpg')
             # For every face in frame, remove from list of current people
             removed_ids = self.remove_faces(faces)
             # Send leave time to database
@@ -127,23 +153,31 @@ class OUT(System):
                 output_data.append({curr_id: curr_time})
             # TODO: Send output_data to database
 
+        cap.release()
 
+
+def run_system(subscription_key):
+    """Runs Pseudosystem that imitates 2 webcams, switches between the 2 systems every 10 seconds"""
+    in_system = IN(subscription_key)
+    out_system = OUT(subscription_key)
+    for _ in range(1):
+        in_system.run(3)
+        out_system.run(3)
 
 
 def test():
-
-    sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
-    sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
-    # 2 faces of 5 different people
-    in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
-                'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
-    out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
-    sys.run(in_input)
-    print(len(System.seen))
-    sys2.run(out_input)
-    print(len(System.seen))
-
-
+    # sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
+    # sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
+    # # 2 faces of 5 different people
+    # in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
+    #             'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
+    # out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
+    # sys.run()
+    # print(len(System.seen))
+    # sys2.run(out_input)
+    # print(len(System.seen))
+    pass
 
 
-test()
+
+run_system("553c3c0a400a4f6ea90223e6ae996ce3")
