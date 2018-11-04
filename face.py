@@ -1,5 +1,6 @@
 import requests
 import datetime
+import time
 import cv2
 import os
 
@@ -45,6 +46,8 @@ class System:
             Deletes id1 and matched face from self.seen"""
         if not isinstance(cur_id, str):
             raise Exception('Error: id parameter must be of type string')
+        if len(self.seen) == 0:
+            return None
         face_api_url = 'https://westus.api.cognitive.microsoft.com/face/v1.0/findsimilars'
         headers = {'Ocp-Apim-Subscription-Key': self.subscription_key}
         data = {
@@ -55,13 +58,12 @@ class System:
         }
         response = requests.post(face_api_url, json=data, headers=headers)
         recognized = response.json()
-        # if remove:
-            # if cur_id in self.seen:
-            #     self.remove_id(cur_id)
-            # for face in recognized:
-            #     self.remove_id(face['faceId'])
         if len(recognized) == 0:
             return None
+        if not isinstance(recognized, list):
+            print("hmmmmmmm")
+            print(recognized)
+            return recognized
         return recognized[0]
 
     def get_ids(self):
@@ -95,6 +97,8 @@ class System:
             recognized_face = self.recognizer(curr_id)
             if recognized_face is None:
                 continue  # Person left who was not recorded entering...
+            print("deleting...")
+            print(recognized_face)
             recognized_id = recognized_face['faceId']
             ids.append(recognized_id)
             if recognized_id in self.seen:
@@ -108,14 +112,16 @@ class System:
 
 
 class IN(System):
-    def run(self, test_input=None):
+    def run(self, duration):  # TODO: Get rid of start_time if not using pseudosystem
         """Continuously takes in image frames and runs detection, logging them in set"""
-        # TODO: Get images from a webcam continuously, remove input
         # for img in test_input:
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             raise Exception("Error: Video Camera not found")
-        for i in range(5):
+        start_time = time.process_time()
+        while True:
+            if time.process_time() - start_time >= duration:
+                break
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             ret, frame = cap.read()
@@ -128,12 +134,14 @@ class IN(System):
 
 
 class OUT(System):
-    def run(self, test_input=None):
+    def run(self, duration):  # TODO: Get ride of start_time if not using pseudosystem
         """Detects faces from input, runs detection to delete id from database and log output time"""
-        # TODO: Get images from webcam continuously, remove input
         # for img in test_input:
         cap = cv2.VideoCapture(0)
-        for i in range(5):
+        start_time = time.process_time()
+        while True:
+            if time.process_time() - start_time >= duration:
+                break
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             ret, frame = cap.read()
@@ -152,25 +160,28 @@ class OUT(System):
         cap.release()
 
 
+def run_system(subscription_key):
+    """Runs Pseudosystem that imitates 2 webcams, switches between the 2 systems every 10 seconds"""
+    in_system = IN(subscription_key)
+    out_system = OUT(subscription_key)
+    for _ in range(1):
+        in_system.run(5)
+        out_system.run(5)
 
 
 def test():
-    # url = 'http://127.0.0.1:8000/'
-    # data = {'hi': 'yeet'}
-    # requests.post(url, data)
-
-    sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
+    # sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
     # sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
     # # 2 faces of 5 different people
     # in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
     #             'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
     # out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
-    sys.run()
-    print(len(System.seen))
+    # sys.run()
+    # print(len(System.seen))
     # sys2.run(out_input)
     # print(len(System.seen))
+    pass
 
 
 
-
-test()
+run_system("553c3c0a400a4f6ea90223e6ae996ce3")
