@@ -10,8 +10,11 @@ def graph_all(inFrame, outFrame):
     create_age_hist(inFrame)
     plt.subplot(222)
     create_gender_bar(inFrame)
-    plt.subplot(223)
-    out_graph_test(outFrame)
+    if outFrame is not None:
+        plt.subplot(223)
+        out_graph_test(outFrame)
+    plt.subplot(224)
+    create_sentiments_hist(inFrame)
     plt.pause(1)
     plt.clf()
 
@@ -42,5 +45,13 @@ def create_gender_bar(dataframe):
 def out_graph_test(dataframe):
     out = dataframe['faceAttributes.age']
 
-    plt.bar(out)
+    plt.hist(out)
 
+def create_sentiments_hist(dataframe):
+   emotions = dataframe[['faceAttributes.emotion.happiness','faceAttributes.emotion.sadness','faceAttributes.emotion.anger','faceAttributes.emotion.disgust']]
+   x = np.array(['Happiness','Sadness','Anger','Disgust'])
+   y = np.array([emotions['faceAttributes.emotion.happiness'].mean(),emotions['faceAttributes.emotion.sadness'].mean(),emotions['faceAttributes.emotion.anger'].mean(),emotions['faceAttributes.emotion.disgust'].mean()])
+   sns.barplot(x,y)
+   plt.legend()
+   plt.xlabel('Emotions')
+   plt.show()
