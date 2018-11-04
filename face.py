@@ -1,6 +1,7 @@
 import requests
 import datetime
 import cv2
+import os
 
 
 class System:
@@ -102,38 +103,43 @@ class System:
                 self.remove_id(curr_id)
         return ids
 
-    def webcam_capture(self):
-        cap = cv2.VideoCapture(0)
-        if not cap.isOpened():
-            raise Exception("Error: Video Camera Not Found")
-        # while True:
-        ret, frame = cap.read()
-        cv2.imwrite('photo.jpg', frame)
-        # self.detect(str(frame))
-        # cv2.imshow('frame', frame)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     return
-        # cap.release()
-        # cv2.destroyAllWindows()
+
 
 
 
 class IN(System):
-    def run(self, input):
+    def run(self, test_input=None):
         """Continuously takes in image frames and runs detection, logging them in set"""
         # TODO: Get images from a webcam continuously, remove input
-        for img in input:
-            faces = self.detect(img)
+        # for img in test_input:
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            raise Exception("Error: Video Camera not found")
+        for i in range(5):
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            ret, frame = cap.read()
+            cv2.imwrite('photo.jpg', frame)
+            faces = self.detect('photo.jpg')
+            os.remove('photo.jpg')
             self.log_faces(faces)
             # TODO: Send faces to database
+        cap.release()
 
 
 class OUT(System):
-    def run(self, input):
+    def run(self, test_input=None):
         """Detects faces from input, runs detection to delete id from database and log output time"""
         # TODO: Get images from webcam continuously, remove input
-        for img in input:
-            faces = self.detect(img)
+        # for img in test_input:
+        cap = cv2.VideoCapture(0)
+        for i in range(5):
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            ret, frame = cap.read()
+            cv2.imwrite('photo.jpg', frame)
+            faces = self.detect('photo.jpg')
+            os.remove('photo.jpg')
             # For every face in frame, remove from list of current people
             removed_ids = self.remove_faces(faces)
             # Send leave time to database
@@ -143,20 +149,24 @@ class OUT(System):
                 output_data.append({curr_id: curr_time})
             # TODO: Send output_data to database
 
+        cap.release()
+
 
 
 
 def test():
+    # url = 'http://127.0.0.1:8000/'
+    # data = {'hi': 'yeet'}
+    # requests.post(url, data)
 
     sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
-    sys.webcam_capture()
     # sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
     # # 2 faces of 5 different people
     # in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
     #             'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
     # out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
-    # sys.run(in_input)
-    # print(len(System.seen))
+    sys.run()
+    print(len(System.seen))
     # sys2.run(out_input)
     # print(len(System.seen))
 
