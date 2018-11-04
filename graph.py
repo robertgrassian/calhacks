@@ -9,7 +9,7 @@ import json
 
 plotly.tools.set_credentials_file(username='trevorwise16', api_key='EhhKIRbvdFkt3pfcIBP4')
 
-def graph(arrived, left, total):
+def graph(current, exited, total):
     fig = tools.make_subplots(rows=1, cols=2)
 
     g1 = graph1(total)
@@ -23,7 +23,6 @@ def graph(arrived, left, total):
     py.plot(fig, filename='basic-line', auto_open=True)
     fig.append_trace(g1, 1, 1)
     #fig.append_trace(g2, 1, 2)
-    py.plot(fig, filename="basic-line", auto_open=True)
     plt.show()
 
 '''  
@@ -60,8 +59,8 @@ def graph2(total):
                             line=dict(color='#000000', width=2)),
                 domain={'x': [0.0, 0.5], 'y': [0.0, 0.5]})
 
-def graph3(total, left):
-    timeInClub = [(faceLeft["time"] - total[faceLeft['faceId']]['time']).seconds // 60 for faceLeft in left.values()]
+def graph3(total, exited):
+    timeInClub = [(faceLeft["time"] - total[faceLeft['faceId']]['time']).seconds // 60 for faceLeft in exited.values()]
     return go.Histogram(x=timeInClub)
 
 def pyramidGraph(total):
@@ -73,7 +72,7 @@ def pyramidGraph(total):
             menAge.append(j['faceAttributes']['age'])
         else:
             womenAge.append(j['faceAttributes']['age'])
-            
+
     women_bins = np.array([-600, -623, -653, -650, -670, -578, -541, -411, -322, -230])
     men_bins = np.array([600, 623, 653, 650, 670, 578, 541, 360, 312, 170])
     layout = go.Layout(yaxis=go.layout.YAxis(title='Age'),

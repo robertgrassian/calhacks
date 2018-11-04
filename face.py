@@ -5,7 +5,9 @@ import cv2
 import os
 import graph
 import threading
-
+import json
+import time
+import keyboard
 
 class System:
     CONFIDENCE = 0.5
@@ -29,6 +31,7 @@ class System:
             'returnFaceLandmarks': 'false',
             'returnFaceAttributes': 'age,gender,emotion,accessories'
         }
+        time.sleep(.250)
         if file_type == "binary_data":
             headers = {'Ocp-Apim-Subscription-Key': self.subscription_key,
                        'Content-Type': 'application/octet-stream'}
@@ -40,6 +43,7 @@ class System:
             response = requests.post(face_api_url, params=params, headers=headers, json=data)
 
         faces = response.json()
+        print(faces)
         curr_time = self.time.today()
         for face in faces:
             face['time'] = curr_time
@@ -191,7 +195,11 @@ def run_system(subscription_key):
     t1.start()
     t2.start()
     # Call graph func
-    graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
+    while True:
+        status = input()
+        if status == 'graph':
+            graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
+
 
 
 

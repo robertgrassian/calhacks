@@ -8,7 +8,8 @@ def ssh_read_in_db():
         ssh_private_key='~/Desktop/calhacks.pem',
         remote_bind_address=('127.0.0.1', 3306),
     ) as server:
-        conn = create_engine("mysql+mysqldb://server:calhacks@localhost:3306/face_base")
+        conn = create_engine("mysql+mysqldb://server:calhacks@127.0.0.1:3306/face_base")
+        conn.connect()
         df = pd.read_sql_table(table_name='testEnter', con=conn)
     print(df)
 
