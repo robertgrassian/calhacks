@@ -1,11 +1,16 @@
 import MySQLdb
-
+from mysql.constants import *
 
 class MySqlConnection():
     def __init__(self):
         print("Open MySQLConnection...")
-        self.connection = MySQLdb.connect(host="18.223.212.152", port=3306, user='yoneo', passwd='raptor98', db='face_base', charset='utf8')
-        self.cursor = self.connection.cursor(MySQLdb.cursor.DictCursor)
+        self.connection = MySQLdb.connect(host="18.223.212.152", port=3306, user='server', passwd='calhacks', db='face_base')
+        if (self.connection):
+            print("Conn Success")
+        else:
+            print("Conn not success")
+        print("MySQLConnection opened successfully!")
+        self.cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
 
     def __del__(self):
         print("Close MySQLConnection...")
@@ -30,7 +35,7 @@ def queryExecute(commandType, inputSql, param):
     
     print("sql(execute): " + str(con.cursor._last_executed))
 
-    if commandType == STR_SQLTYPE_SELECTL
+    if commandType == STR_SQLTYPE_SELECT:
         msg = 'result'
         for row in con.cursor:
             print(msg + "      :" + str(row))
