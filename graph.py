@@ -14,7 +14,7 @@ def graph(current, exited, total):
 
     g1 = graph1(total)
     g2 = graph2(total)
-    g3 = graph3(total)
+    g3 = graph3(total, exited)
 
     fig.append_trace(g1, 1, 1)
     # fig.append_trace(g2, 1, 2)
