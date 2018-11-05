@@ -26,18 +26,18 @@ We'll also be storing all of this event data, and the large number of data point
 
 ## Dependencies
 Listed are the core dependencies for our project:
-- Python 3.7 
+- Python 3.7
 - Pandas
 - numpy
 - matplotlib
 - Seaborn
-- OpenCV (cv2)
-Dependenices that are required but not necessary for functionality in this version:
+- OpenCV (cv2)  
+Dependenices that are required but not necessary for functionality in this version:  
 - MySQL
 - MySQLdb
 - sqlalchemy
 - sshtunnel
 - plotly
-- django
-APIs:
+- django  
+APIs:  
 - Microsoft Azure Face API
