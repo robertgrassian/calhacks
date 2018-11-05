@@ -25,10 +25,10 @@ We have a couple things in store for our project. First off, we're looking to ho
 We'll also be storing all of this event data, and the large number of data points we have access can be very useful for data science and machine learning models, so we hope to create analytics to further improve these businesses goals.
 
 ## Dependencies
-APIs:  
+#### APIs:  
 - Microsoft Azure Face API
 
-Listed are the core dependencies for our project:
+#### Listed are the core dependencies for our project:
 - Python 3.7
 - Pandas
 - numpy
@@ -36,7 +36,7 @@ Listed are the core dependencies for our project:
 - Seaborn
 - OpenCV (cv2)
 
-Dependenices that are required but not necessary for functionality in this version:  
+#### Dependenices that are required but not necessary for functionality in this version:  
 - MySQL
 - MySQLdb
 - sqlalchemy
