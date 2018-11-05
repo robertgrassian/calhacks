@@ -1,15 +1,11 @@
 import requests
 import datetime
-import time
 import cv2
 import os
-import graph
 import threading
-import json
 import time
-import keyboard
 from parsing.face_json_parse import *
-import pandas as pd
+import pandas as pd # Unused within face.py but necessary to work with dataframes in future.
 from matGraph import *
 
 class System:
@@ -164,9 +160,6 @@ class IN(System):
             faces = self.detect('photo1.jpg')
             os.remove('photo1.jpg')
             self.log_faces(faces)
-            # if not System.curr_df is None:
-            #     print("Faces currently inside ", self.seen)
-            #     graph_all(System.curr_df)
             # TODO: Send faces to database
         cap.release()
 
@@ -185,8 +178,8 @@ class OUT(System):
             ret, frame = cap.read()
             cv2.imwrite('photo2.jpg', frame)
             faces = self.detect('photo2.jpg')
-
             os.remove('photo2.jpg')
+
             # For every face in frame, remove from list of current people
             removed_ids = self.remove_faces(faces)
             for old_id, matched_id in removed_ids:
@@ -194,9 +187,6 @@ class OUT(System):
                     if face['faceId'] == old_id:
                         System.left_data[matched_id] = face
                         System.left_data[matched_id]['faceId'] = matched_id
-            # print("LEFT DF")
-            # print("Faces left", System.left_data)
-
 
             # curr_time = self.time.today()
             # output_data = []
@@ -216,29 +206,11 @@ def run_system(subscription_key):
     t2 = threading.Thread(name='out', target=out_system.run)
     t1.start()
     t2.start()
-    # Call graph func
+
+    """Creates graphics between updates to the data"""
     while True:
-        # status = input()
-        # if x == 1000:
-        #     graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
-        # if status == 'graph':
-        #     graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
         if in_system.curr_df is not None:
             graph_all(in_system.curr_df, in_system.left_df)
-
-
-def test():
-    # sys = IN("553c3c0a400a4f6ea90223e6ae996ce3")
-    # sys2 = OUT("553c3c0a400a4f6ea90223e6ae996ce3")
-    # # 2 faces of 5 different people
-    # in_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg',
-    #             'orl_faces/s1/2.jpeg', 'orl_faces/s2/2.jpeg', 'orl_faces/s3/2.jpeg', 'orl_faces/s4/2.jpeg', 'orl_faces/s5/2.jpeg']
-    # out_input = ['orl_faces/s1/1.jpeg', 'orl_faces/s2/1.jpeg', 'orl_faces/s3/1.jpeg', 'orl_faces/s4/1.jpeg', 'orl_faces/s5/1.jpeg']
-    # sys.run()
-    # print(len(System.seen))
-    # sys2.run(out_input)
-    # print(len(System.seen))
-    pass
 
 
 

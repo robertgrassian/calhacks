@@ -4,7 +4,7 @@ from mysql.constants import *
 class MySqlConnection():
     def __init__(self):
         print("Open MySQLConnection...")
-        self.connection = MySQLdb.connect(host="18.223.212.152", port=3306, user='server', passwd='', db='face_base')
+        self.connection = MySQLdb.connect(host="<serverip>", port=3306, user='server', passwd='', db='face_base')
         if (self.connection):
             print("Conn Success")
         else:

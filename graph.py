@@ -5,7 +5,6 @@ import plotly
 import plotly.plotly as py
 from plotly import tools
 import plotly.graph_objs as go
-import json
 
 plotly.tools.set_credentials_file(username='trevorwise16', api_key='EhhKIRbvdFkt3pfcIBP4')
 
