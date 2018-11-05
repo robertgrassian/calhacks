@@ -44,4 +44,4 @@ We'll also be storing all of this event data, and the large number of data point
 - django  
 
 ## Running the program
-(Coming soon)
+(Coming soon!)
