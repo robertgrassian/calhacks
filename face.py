@@ -48,7 +48,7 @@ class System:
             response = requests.post(face_api_url, params=params, headers=headers, json=data)
 
         faces = response.json()
-        print(faces)
+        # print(faces)
         curr_time = self.time.today()
         for face in faces:
             face['time'] = curr_time
@@ -130,7 +130,7 @@ class System:
             stamped_face = face
             
             if recognized_id in self.seen:
-                stamped_face['enter_time'] = System.curr_df[System.curr_df['faceId'] == recognized_id]['time'][0]
+                stamped_face['enter_time'] = System.curr_df[System.curr_df['faceId'] == recognized_id]['time']
                 normed_stamp = to_normalized_dataframe(stamped_face)
                 if System.left_df is not None:
                     System.left_df = df_append(System.left_df, normed_stamp)
@@ -194,12 +194,8 @@ class OUT(System):
                     if face['faceId'] == old_id:
                         System.left_data[matched_id] = face
                         System.left_data[matched_id]['faceId'] = matched_id
-            print("LEFT DF")
-            print(System.left_df)
-            if System.left_df is not None:
-                print("Faces currently inside ", self.seen)
-                graph_all(System.curr_df, System.left_df)
-            print("Faces left", System.left_data)
+            # print("LEFT DF")
+            # print("Faces left", System.left_data)
 
 
             # curr_time = self.time.today()
@@ -221,16 +217,14 @@ def run_system(subscription_key):
     t1.start()
     t2.start()
     # Call graph func
-    x = 0
     while True:
-        x += 1
-        status = input()
-        if x == 1000:
-            graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
-        if status == 'graph':
-            graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
-
-
+        # status = input()
+        # if x == 1000:
+        #     graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
+        # if status == 'graph':
+        #     graph.graph(in_system.curr_data, in_system.left_data, in_system.all_data)
+        if in_system.curr_df is not None:
+            graph_all(in_system.curr_df, in_system.left_df)
 
 
 def test():
