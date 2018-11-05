@@ -23,3 +23,21 @@ Our core logic revolves around an "In" and and "Out" camera, that respectively t
 We have a couple things in store for our project. First off, we're looking to host our scripts using a Django web application, and connect this remotely with our viewing cameras so we can constantly crunch data in real time. 
 
 We'll also be storing all of this event data, and the large number of data points we have access can be very useful for data science and machine learning models, so we hope to create analytics to further improve these businesses goals.
+
+## Dependencies
+Listed are the core dependencies for our project:
+- Python 3.7 
+- Pandas
+- numpy
+- matplotlib
+- Seaborn
+- OpenCV (cv2)
+Dependenices that are required but not necessary for functionality in this version:
+- MySQL
+- MySQLdb
+- sqlalchemy
+- sshtunnel
+- plotly
+- django
+APIs:
+- Microsoft Azure Face API
