@@ -1,6 +1,6 @@
 # calhacks
-Cal Hacks 5.0
-Our project for CalHacks 2018
+Cal Hacks 5.0  
+Our project for CalHacks 2018  
 Creators: Robert Grassian, Yoneo Arai, Peter Dykas, Trevor Wise
 
 ## Our Project
